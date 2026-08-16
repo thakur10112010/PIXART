@@ -1,0 +1,2537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>PIXART — Edit Photos Like a Pro, In Seconds</title>
+<meta name="description" content="AI-powered photo editing in your browser. Remove backgrounds, retouch, and design — no downloads, no learning curve." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        ink: '#0E0E13',
+        surface: '#17171F',
+        surface2: '#1E1E28',
+        border: '#2A2A36',
+        violet: '#7C3AED',
+        magenta: '#EC4899',
+        cyan: '#22D3EE',
+        mute: '#9CA3AF',
+      },
+      fontFamily: {
+        display: ['"Space Grotesk"', 'sans-serif'],
+        body: ['"Inter"', 'sans-serif'],
+      }
+    }
+  }
+}
+</script>
+
+<style>
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #0E0E13;
+}
+
+.grad-text {
+  background: linear-gradient(90deg, #7C3AED, #EC4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.grad-btn {
+  background: linear-gradient(90deg, #7C3AED, #EC4899);
+}
+
+.mesh {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(124,58,237,0.35), transparent 40%),
+    radial-gradient(circle at 85% 10%, rgba(236,72,153,0.30), transparent 45%),
+    radial-gradient(circle at 60% 80%, rgba(34,211,238,0.18), transparent 40%);
+}
+
+.card {
+  background: #17171F;
+  border: 1px solid #2A2A36;
+}
+
+nav.scrolled {
+  background: rgba(14,14,19,0.75);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid #2A2A36;
+}
+
+.compare {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  aspect-ratio: 4/3;
+  user-select: none;
+}
+
+.compare img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.compare .after-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  clip-path: inset(0 50% 0 0);
+}
+
+.compare input[type=range] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: ew-resize;
+  z-index: 10;
+}
+
+.compare input[type=range]::-webkit-slider-thumb {
+  appearance: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: white;
+  border: 4px solid #7C3AED;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+}
+
+.compare input[type=range]::-webkit-slider-runnable-track {
+  background: transparent;
+}
+
+.compare .handle-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: white;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 5;
+  box-shadow: 0 0 8px rgba(0,0,0,0.5);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: scroll 28s linear infinite;
+}
+
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid #22D3EE;
+  outline-offset: 3px;
+}
+</style>
+</head>
+
+<body class="bg-ink text-white font-body antialiased">
+
+<!-- NAVIGATION -->
+<nav id="mainNav" class="fixed top-0 inset-x-0 z-50 transition-all duration-300">
+
+  <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+
+    <a href="#" class="flex items-center gap-2 focus-ring rounded">
+
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="8" fill="url(#navgrad)"/>
+        <path
+          d="M8 18L13 9L18 18"
+          stroke="white"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <defs>
+          <linearGradient id="navgrad" x1="0" y1="0" x2="28" y2="28">
+            <stop stop-color="#7C3AED"/>
+            <stop offset="1" stop-color="#EC4899"/>
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <span class="font-display font-semibold text-lg tracking-tight">
+        PIXART
+      </span>
+
+    </a>
+
+    <div class="hidden md:flex items-center gap-8 text-sm text-mute">
+      <a href="#features" class="hover:text-white transition-colors focus-ring rounded">Features</a>
+      <a href="#templates" class="hover:text-white transition-colors focus-ring rounded">Templates</a>
+      <a href="#pricing" class="hover:text-white transition-colors focus-ring rounded">Pricing</a>
+      <a href="#" class="hover:text-white transition-colors focus-ring rounded">Learn</a>
+    </div>
+
+    <div class="hidden md:flex items-center gap-3">
+      <a
+        href="#"
+        class="text-sm text-mute hover:text-white transition-colors focus-ring rounded px-3 py-2">
+        Log in
+      </a>
+
+      <a
+  href="#"
+  id="tryFreeBtn"
+  class="grad-btn text-sm font-medium px-5 py-2.5 rounded-full hover:opacity-90 transition-opacity focus-ring">
+  Try Free →
+</a>
+    </div>
+
+    <button
+      id="menuBtn"
+      class="md:hidden focus-ring rounded p-2"
+      aria-label="Open menu"
+      aria-expanded="false">
+
+      <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+        <path
+          stroke="white"
+          stroke-width="2"
+          stroke-linecap="round"
+          d="M4 6h16M4 12h16M4 18h16"
+        />
+      </svg>
+
+    </button>
+
+  </div>
+
+  <div
+    id="mobileMenu"
+    class="hidden md:hidden bg-ink border-t border-border px-6 py-6 flex flex-col gap-5 text-mute">
+
+    <a href="#features" class="hover:text-white">Features</a>
+    <a href="#templates" class="hover:text-white">Templates</a>
+    <a href="#pricing" class="hover:text-white">Pricing</a>
+    <a href="#" class="hover:text-white">Learn</a>
+    <a href="#" class="hover:text-white">Log in</a>
+
+    <a
+      href="#"
+      class="grad-btn text-white text-center font-medium px-5 py-3 rounded-full">
+      Try Free →
+    </a>
+
+  </div>
+
+</nav>
+
+
+<!-- HERO -->
+<header class="relative mesh pt-40 pb-24 md:pt-48 md:pb-32 overflow-hidden">
+
+  <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+
+    <div>
+
+      <span
+        class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full border border-border bg-surface text-mute mb-6">
+
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan"></span>
+
+        AI-Powered Editing, Reimagined
+
+      </span>
+
+      <h1
+        class="font-display font-semibold text-5xl md:text-7xl leading-[1.03] tracking-tight mb-6">
+
+        Edit photos like<br/>
+
+        <span class="grad-text">
+          a pro.
+        </span>
+
+        In seconds.
+
+      </h1>
+
+      <p class="text-lg text-mute max-w-md mb-8 leading-relaxed">
+
+        Remove backgrounds, retouch portraits, and design graphics —
+        all in your browser. No downloads, no learning curve.
+
+      </p>
+
+      <div class="flex flex-wrap items-center gap-4 mb-10">
+
+        <a
+  href="#"
+  id="startEditingBtn"
+  class="...">
+  START EDITING FREE
+</a>
+
+        <a
+          href="#"
+          class="flex items-center gap-2 font-medium px-7 py-3.5 rounded-full border border-border hover:border-mute transition-colors focus-ring">
+
+          <svg
+            width="16"
+            height="16"
+            fill="white"
+            viewBox="0 0 16 16">
+
+            <path d="M4 2.5v11l10-5.5-10-5.5z"/>
+
+          </svg>
+
+          Watch 30s Demo
+
+        </a>
+
+      </div>
+
+      <div class="flex items-center gap-3">
+
+        <div class="flex -space-x-3">
+
+          <img
+            class="w-9 h-9 rounded-full border-2 border-ink"
+            src="https://i.pravatar.cc/64?img=12"
+            alt="">
+
+          <img
+            class="w-9 h-9 rounded-full border-2 border-ink"
+            src="https://i.pravatar.cc/64?img=32"
+            alt="">
+
+          <img
+            class="w-9 h-9 rounded-full border-2 border-ink"
+            src="https://i.pravatar.cc/64?img=45"
+            alt="">
+
+          <img
+            class="w-9 h-9 rounded-full border-2 border-ink"
+            src="https://i.pravatar.cc/64?img=5"
+            alt="">
+
+        </div>
+
+        <p class="text-sm text-mute">
+          <span class="text-white font-medium">2M+</span>
+          creators editing daily
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- BEFORE / AFTER -->
+    <div class="compare shadow-2xl shadow-violet/20 border border-border">
+
+      <img
+        src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=900&auto=format&fit=crop"
+        alt="Original photo before editing"
+      />
+
+      <div class="after-wrap" id="afterWrap">
+
+        <img
+          src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=900&auto=format&fit=crop&sat=-100&con=20"
+          alt="Edited photo after enhancement"
+        />
+
+      </div>
+
+      <div
+        class="handle-line"
+        id="handleLine">
+      </div>
+
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value="50"
+        id="compareRange"
+        aria-label="Drag to compare before and after"
+      />
+
+      <span
+        class="absolute top-4 left-4 text-xs font-medium bg-black/50 px-2.5 py-1 rounded-full backdrop-blur-sm">
+        Before
+      </span>
+
+      <span
+        class="absolute top-4 right-4 text-xs font-medium bg-black/50 px-2.5 py-1 rounded-full backdrop-blur-sm">
+        After
+      </span>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<!-- TRUSTED BY -->
+<section class="border-y border-border py-10 overflow-hidden">
+
+  <p class="text-center text-xs uppercase tracking-widest text-mute mb-6">
+    Trusted by teams at
+  </p>
+
+  <div class="marquee-track opacity-50">
+
+    <div class="flex items-center gap-16 px-8">
+
+      <span class="font-display text-2xl font-semibold">Pixelworks</span>
+      <span class="font-display text-2xl font-semibold">Northwind</span>
+      <span class="font-display text-2xl font-semibold">Studio Nine</span>
+      <span class="font-display text-2xl font-semibold">Framewell</span>
+      <span class="font-display text-2xl font-semibold">Halcyon</span>
+      <span class="font-display text-2xl font-semibold">Vantage</span>
+
+    </div>
+
+    <div
+      class="flex items-center gap-16 px-8"
+      aria-hidden="true">
+
+      <span class="font-display text-2xl font-semibold">Pixelworks</span>
+      <span class="font-display text-2xl font-semibold">Northwind</span>
+      <span class="font-display text-2xl font-semibold">Studio Nine</span>
+      <span class="font-display text-2xl font-semibold">Framewell</span>
+      <span class="font-display text-2xl font-semibold">Halcyon</span>
+      <span class="font-display text-2xl font-semibold">Vantage</span>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section class="py-20 px-6">
+
+  <div class="max-w-6xl mx-auto">
+
+    <div class="text-center mb-10">
+
+      <p class="text-violet font-medium mb-3">
+        SEE PIXART IN ACTION
+      </p>
+
+      <h2 class="font-display text-4xl md:text-5xl font-semibold">
+        Create something amazing.
+      </h2>
+
+      <p class="text-mute mt-4 max-w-2xl mx-auto">
+        Upload your image, edit it, and bring your ideas to life.
+      </p>
+
+    </div>
+
+    <div class="relative overflow-hidden rounded-3xl border border-border shadow-2xl">
+
+      <video
+        class="w-full h-auto block"
+        autoplay
+        muted
+        loop
+        playsinline
+        controls
+        preload="metadata">
+
+        <source
+          src="./pixart-demo.mp4"
+          type="video/mp4">
+
+        Your browser does not support video playback.
+
+      </video>
+
+    </div>
+
+  </div>
+
+</section>
+<!-- FEATURES -->
+<section
+  id="features"
+  class="py-24 md:py-32 max-w-7xl mx-auto px-6">
+
+  <div class="max-w-xl mb-20">
+
+    <span class="text-xs font-medium text-cyan uppercase tracking-widest">
+      Features
+    </span>
+
+    <h2 class="font-display font-semibold text-4xl md:text-5xl tracking-tight mt-3">
+      Everything you need. Nothing you don't.
+    </h2>
+
+  </div>
+
+
+  <div class="space-y-24 md:space-y-32">
+
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+
+      <div class="rounded-2xl overflow-hidden border border-border order-2 md:order-1">
+
+        <img
+          src="https://images.unsplash.com/photo-1502691876148-a84978e59af8?q=80&w=900&auto=format&fit=crop"
+          class="w-full h-full object-cover"
+          alt="Portrait with background removed"
+        />
+
+      </div>
+
+      <div class="order-1 md:order-2">
+
+        <h3 class="font-display font-semibold text-2xl md:text-3xl mb-4">
+          AI Background Removal
+        </h3>
+
+        <p class="text-mute leading-relaxed mb-6">
+          Click once. Get a pixel-perfect cutout — hair, fur, and fine edges included.
+          No selection tools, no patience required.
+        </p>
+
+        <a
+          href="#"
+          class="text-cyan font-medium text-sm hover:underline focus-ring rounded">
+          Learn more →
+        </a>
+
+      </div>
+
+    </div>
+
+
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+
+      <div>
+
+        <h3 class="font-display font-semibold text-2xl md:text-3xl mb-4">
+          Smart Retouch &amp; Enhance
+        </h3>
+
+        <p class="text-mute leading-relaxed mb-6">
+          Fix lighting, smooth skin, sharpen detail — automatically calibrated to
+          the photo, not a one-size slider.
+        </p>
+
+        <a
+          href="#"
+          class="text-cyan font-medium text-sm hover:underline focus-ring rounded">
+          Learn more →
+        </a>
+
+      </div>
+
+      <div class="rounded-2xl overflow-hidden border border-border">
+
+        <img
+          src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?q=80&w=900&auto=format&fit=crop"
+          class="w-full h-full object-cover"
+          alt="Retouched portrait with enhanced lighting"
+        />
+
+      </div>
+
+    </div>
+
+
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+
+      <div class="rounded-2xl overflow-hidden border border-border order-2 md:order-1">
+
+        <img
+          src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?q=80&w=900&auto=format&fit=crop"
+          class="w-full h-full object-cover"
+          alt="Design resized across multiple social formats"
+        />
+
+      </div>
+
+      <div class="order-1 md:order-2">
+
+        <h3 class="font-display font-semibold text-2xl md:text-3xl mb-4">
+          Magic Resize
+        </h3>
+
+        <p class="text-mute leading-relaxed mb-6">
+          Design once. Reflow instantly to Instagram, YouTube, posters,
+          and print — composition preserved, not just cropped.
+        </p>
+
+        <a
+          href="#"
+          class="text-cyan font-medium text-sm hover:underline focus-ring rounded">
+          Learn more →
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- WORKFLOW -->
+<section class="py-24 border-t border-border bg-surface/40">
+
+  <div class="max-w-7xl mx-auto px-6">
+
+    <div class="text-center max-w-lg mx-auto mb-16">
+
+      <span class="text-xs font-medium text-cyan uppercase tracking-widest">
+        Workflow
+      </span>
+
+      <h2 class="font-display font-semibold text-4xl tracking-tight mt-3">
+        Upload. Edit. Export.
+      </h2>
+
+    </div>
+
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <div class="card rounded-2xl p-8">
+
+        <span class="font-display text-sm text-violet font-semibold">
+          Step 1
+        </span>
+
+        <h3 class="font-display font-semibold text-xl mt-3 mb-2">
+          Upload your photo
+        </h3>
+
+        <p class="text-mute text-sm leading-relaxed">
+          Drag in any image, or start from a template.
+          JPG, PNG, RAW — all supported.
+        </p>
+
+      </div>
+
+
+      <div class="card rounded-2xl p-8">
+
+        <span class="font-display text-sm text-magenta font-semibold">
+          Step 2
+        </span>
+
+        <h3 class="font-display font-semibold text-xl mt-3 mb-2">
+          Edit with AI or by hand
+        </h3>
+
+        <p class="text-mute text-sm leading-relaxed">
+          Use one-click AI tools, or drop into the full layer-based
+          editor for total control.
+        </p>
+
+      </div>
+
+
+      <div class="card rounded-2xl p-8">
+
+        <span class="font-display text-sm text-cyan font-semibold">
+          Step 3
+        </span>
+
+        <h3 class="font-display font-semibold text-xl mt-3 mb-2">
+          Export anywhere
+        </h3>
+
+        <p class="text-mute text-sm leading-relaxed">
+          Download in any format and resolution,
+          or push straight to your socials.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- EDITOR -->
+<section class="py-24 md:py-32 max-w-7xl mx-auto px-6">
+
+  <div class="text-center max-w-xl mx-auto mb-14">
+
+    <span class="text-xs font-medium text-cyan uppercase tracking-widest">
+      The Editor
+    </span>
+
+    <h2 class="font-display font-semibold text-4xl md:text-5xl tracking-tight mt-3">
+      Pro-grade tools, zero setup.
+    </h2>
+
+  </div>
+
+
+  <div
+    class="rounded-2xl border border-border bg-surface overflow-hidden shadow-2xl shadow-violet/10">
+
+    <div
+      class="flex items-center gap-2 px-4 py-3 border-b border-border bg-surface2">
+
+      <span class="w-3 h-3 rounded-full bg-[#FF5F57]"></span>
+      <span class="w-3 h-3 rounded-full bg-[#FEBC2E]"></span>
+      <span class="w-3 h-3 rounded-full bg-[#28C840]"></span>
+
+      <span class="text-xs text-mute ml-3">
+        PIXART Editor — untitled-project.png
+      </span>
+
+    </div>
+
+    <img
+      src="https://images.unsplash.com/photo-1618004912476-29818d81ae2e?q=80&w=1600&auto=format&fit=crop"
+      class="w-full object-cover"
+      alt="PIXART photo editor interface"
+    />
+
+  </div>
+
+</section>
+
+
+<!-- TEMPLATES -->
+<section
+  id="templates"
+  class="py-24 border-t border-border bg-surface/40">
+
+  <div class="max-w-7xl mx-auto px-6">
+
+    <div class="flex items-end justify-between mb-12 flex-wrap gap-4">
+
+      <div>
+
+        <span class="text-xs font-medium text-cyan uppercase tracking-widest">
+          Templates
+        </span>
+
+        <h2 class="font-display font-semibold text-4xl tracking-tight mt-3">
+          Start from a spark, not a blank canvas.
+        </h2>
+
+      </div>
+
+      <a
+        href="#"
+        class="text-sm font-medium text-mute hover:text-white transition-colors focus-ring rounded">
+        Browse all →
+      </a>
+
+    </div>
+
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+
+      <div class="group relative rounded-xl overflow-hidden border border-border aspect-[3/4]">
+
+        <img
+          src="https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=500&auto=format&fit=crop"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          alt="Instagram post template"
+        />
+
+        <div
+          class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-end p-4 opacity-0 group-hover:opacity-100">
+
+          <span class="text-sm font-medium">
+            Use template
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="group relative rounded-xl overflow-hidden border border-border aspect-[3/4]">
+
+        <img
+          src="https://images.unsplash.com/photo-1611162617263-4ec3060a058e?q=80&w=500&auto=format&fit=crop"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          alt="YouTube thumbnail template"
+        />
+
+        <div
+          class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-end p-4 opacity-0 group-hover:opacity-100">
+
+          <span class="text-sm font-medium">
+            Use template
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="group relative rounded-xl overflow-hidden border border-border aspect-[3/4]">
+
+        <img
+          src="https://images.unsplash.com/photo-1618556450991-2f1af64e8191?q=80&w=500&auto=format&fit=crop"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          alt="Event poster template"
+        />
+
+        <div
+          class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-end p-4 opacity-0 group-hover:opacity-100">
+
+          <span class="text-sm font-medium">
+            Use template
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="group relative rounded-xl overflow-hidden border border-border aspect-[3/4]">
+
+        <img
+          src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=500&auto=format&fit=crop"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          alt="Product ad template"
+        />
+
+        <div
+          class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-end p-4 opacity-0 group-hover:opacity-100">
+
+          <span class="text-sm font-medium">
+            Use template
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- PRICING -->
+<section
+  id="pricing"
+  class="py-24 md:py-32 max-w-7xl mx-auto px-6">
+
+  <div class="text-center max-w-lg mx-auto mb-16">
+
+    <span class="text-xs font-medium text-cyan uppercase tracking-widest">
+      Pricing
+    </span>
+
+    <h2 class="font-display font-semibold text-4xl tracking-tight mt-3">
+      Simple plans. No surprises.
+    </h2>
+
+  </div>
+
+
+  <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+
+    <!-- FREE -->
+    <div class="card rounded-2xl p-8 flex flex-col">
+
+      <h3 class="font-display font-semibold text-lg mb-1">
+        Free
+      </h3>
+
+      <p class="text-mute text-sm mb-6">
+        For casual editing
+      </p>
+
+      <p class="font-display text-4xl font-semibold mb-6">
+        $0
+      </p>
+
+      <ul class="text-sm text-mute space-y-3 mb-8 flex-1">
+
+        <li>✓ Basic AI tools</li>
+        <li>✓ 5 exports / month</li>
+        <li>✓ Standard resolution</li>
+
+      </ul>
+
+      <a
+        href="#"
+        class="text-center border border-border rounded-full py-3 font-medium hover:border-mute transition-colors focus-ring">
+
+        Get Started
+
+      </a>
+
+    </div>
+
+
+    <!-- PRO -->
+    <div
+      class="rounded-2xl p-8 flex flex-col relative bg-surface2"
+      style="
+        border: 1px solid transparent;
+        background-image:
+        linear-gradient(#1E1E28,#1E1E28),
+        linear-gradient(135deg,#7C3AED,#EC4899);
+        background-origin: border-box;
+        background-clip: padding-box,border-box;
+      ">
+
+      <span
+        class="absolute -top-3 left-8 grad-btn text-xs font-medium px-3 py-1 rounded-full">
+        Most Popular
+      </span>
+
+      <h3 class="font-display font-semibold text-lg mb-1">
+        Pro
+      </h3>
+
+      <p class="text-mute text-sm mb-6">
+        For creators &amp; freelancers
+      </p>
+
+      <p class="font-display text-4xl font-semibold mb-6">
+        $12
+        <span class="text-base text-mute font-normal">
+          /mo
+        </span>
+      </p>
+
+      <ul class="text-sm text-mute space-y-3 mb-8 flex-1">
+
+        <li>✓ Full AI toolkit</li>
+        <li>✓ Unlimited exports</li>
+        <li>✓ 4K resolution</li>
+        <li>✓ Premium templates</li>
+
+      </ul>
+
+      <a
+        href="#"
+        class="text-center grad-btn rounded-full py-3 font-medium hover:opacity-90 transition-opacity focus-ring">
+
+        Start Free Trial
+
+      </a>
+
+    </div>
+
+
+    <!-- TEAM -->
+    <div class="card rounded-2xl p-8 flex flex-col">
+
+      <h3 class="font-display font-semibold text-lg mb-1">
+        Team
+      </h3>
+
+      <p class="text-mute text-sm mb-6">
+        For growing brands
+      </p>
+
+      <p class="font-display text-4xl font-semibold mb-6">
+        $39
+        <span class="text-base text-mute font-normal">
+          /mo
+        </span>
+      </p>
+
+      <ul class="text-sm text-mute space-y-3 mb-8 flex-1">
+
+        <li>✓ Everything in Pro</li>
+        <li>✓ Shared workspaces</li>
+        <li>✓ Brand kits</li>
+
+      </ul>
+
+      <a
+        href="#"
+        class="text-center border border-border rounded-full py-3 font-medium hover:border-mute transition-colors focus-ring">
+
+        Contact Sales
+
+      </a>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- TESTIMONIALS -->
+<section
+  class="py-24 border-t border-border bg-surface/40 overflow-hidden">
+
+  <div class="max-w-7xl mx-auto px-6 mb-12">
+
+    <span class="text-xs font-medium text-cyan uppercase tracking-widest">
+      Loved by creators
+    </span>
+
+    <h2 class="font-display font-semibold text-4xl tracking-tight mt-3">
+      Don't take our word for it.
+    </h2>
+
+  </div>
+
+
+  <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-6">
+
+    <div class="card rounded-2xl p-8">
+
+      <p class="text-white leading-relaxed mb-6">
+        "Replaced two subscriptions and my whole editing workflow is faster now."
+      </p>
+
+      <div class="flex items-center gap-3">
+
+        <img
+          src="https://i.pravatar.cc/64?img=15"
+          class="w-10 h-10 rounded-full"
+          alt="">
+
+        <div>
+
+          <p class="text-sm font-medium">
+            Maya Chen
+          </p>
+
+          <p class="text-xs text-mute">
+            Product Photographer
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="card rounded-2xl p-8">
+
+      <p class="text-white leading-relaxed mb-6">
+        "Background removal alone saves our team hours every single week."
+      </p>
+
+      <div class="flex items-center gap-3">
+
+        <img
+          src="https://i.pravatar.cc/64?img=33"
+          class="w-10 h-10 rounded-full"
+          alt="">
+
+        <div>
+
+          <p class="text-sm font-medium">
+            Diego Fernandez
+          </p>
+
+          <p class="text-xs text-mute">
+            Marketing Lead, Halcyon
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="card rounded-2xl p-8">
+
+      <p class="text-white leading-relaxed mb-6">
+        "Finally a browser editor that feels as capable as desktop software."
+      </p>
+
+      <div class="flex items-center gap-3">
+
+        <img
+          src="https://i.pravatar.cc/64?img=48"
+          class="w-10 h-10 rounded-full"
+          alt="">
+
+        <div>
+
+          <p class="text-sm font-medium">
+            Priya Nair
+          </p>
+
+          <p class="text-xs text-mute">
+            Freelance Designer
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- CTA -->
+<section
+  class="relative py-24 md:py-32 mesh border-t border-border overflow-hidden">
+
+  <div class="max-w-3xl mx-auto px-6 text-center relative">
+
+    <h2 class="font-display font-semibold text-4xl md:text-6xl tracking-tight mb-6">
+      Your best edit is one click away.
+    </h2>
+
+    <p class="text-mute text-lg mb-10">
+      Join 2M+ creators editing smarter. No credit card required.
+    </p>
+
+    <a
+      href="#"
+      class="grad-btn inline-block font-medium px-9 py-4 rounded-full hover:opacity-90 transition-opacity focus-ring">
+
+      Get Started — It's Free
+
+    </a>
+
+  </div>
+
+</section>
+
+
+<!-- FOOTER -->
+ <!-- PIXART IMAGE EDITOR -->
+<div
+  id="editorModal"
+  class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-md p-4 md:p-8">
+
+  <div
+    class="w-full h-full max-w-7xl mx-auto bg-surface rounded-2xl border border-border overflow-hidden flex flex-col">
+
+    <!-- TOP BAR -->
+    <div
+      class="h-16 px-5 border-b border-border bg-surface2 flex items-center justify-between shrink-0">
+
+      <div class="flex items-center gap-3">
+
+        <div
+          class="w-9 h-9 rounded-lg grad-btn flex items-center justify-center">
+          ✦
+        </div>
+
+        <div>
+          <h2 class="font-display font-semibold">
+            PIXART Editor
+          </h2>
+
+          <input
+  id="projectName"
+  type="text"
+  value="Untitled Project"
+  class="bg-transparent border-none outline-none text-xs text-mute w-40 focus:text-white"
+  aria-label="Project name"
+/>
+        </div>
+
+      </div>
+
+      <button
+        id="closeEditor"
+        type="button"
+        class="w-10 h-10 rounded-full border border-border hover:bg-white/10 transition focus-ring"
+        aria-label="Close editor">
+
+        ✕
+
+      </button>
+
+    </div>
+
+
+    <!-- EDITOR BODY -->
+    <div class="flex-1 flex flex-col md:flex-row min-h-0">
+
+
+      <!-- LEFT TOOLBAR -->
+      <aside
+        class="w-full md:w-64 border-b md:border-b-0 md:border-r border-border bg-surface2 p-5 overflow-y-auto">
+
+        <h3 class="font-display font-semibold mb-5">
+          Adjust
+        </h3>
+
+
+        <!-- BRIGHTNESS -->
+        <div class="mb-6">
+
+          <div class="flex justify-between mb-2">
+
+            <label
+              for="brightness"
+              class="text-sm text-mute">
+              Brightness
+            </label>
+
+            <span
+              id="brightnessValue"
+              class="text-xs text-mute">
+              0
+            </span>
+
+          </div>
+
+          <input
+            id="brightness"
+            type="range"
+            min="-100"
+            max="100"
+            value="0"
+            class="w-full">
+
+        </div>
+
+
+        <!-- CONTRAST -->
+        <div class="mb-6">
+
+          <div class="flex justify-between mb-2">
+
+            <label
+              for="contrast"
+              class="text-sm text-mute">
+              Contrast
+            </label>
+
+            <span
+              id="contrastValue"
+              class="text-xs text-mute">
+              0
+            </span>
+
+          </div>
+
+          <input
+            id="contrast"
+            type="range"
+            min="-100"
+            max="100"
+            value="0"
+            class="w-full">
+
+        </div>
+
+
+        <!-- SATURATION -->
+        <div class="mb-6">
+
+          <div class="flex justify-between mb-2">
+
+            <label
+              for="saturation"
+              class="text-sm text-mute">
+              Saturation
+            </label>
+
+            <span
+              id="saturationValue"
+              class="text-xs text-mute">
+              0
+            </span>
+
+          </div>
+
+          <input
+            id="saturation"
+            type="range"
+            min="-100"
+            max="100"
+            value="0"
+            class="w-full">
+
+        </div>
+
+
+        <button
+          id="grayscaleBtn"
+          type="button"
+          class="w-full border border-border rounded-xl py-3 mb-3 hover:bg-white/10 transition focus-ring">
+
+          Grayscale
+
+        </button>
+
+
+        <button
+          id="rotateBtn"
+          type="button"
+          class="w-full border border-border rounded-xl py-3 mb-3 hover:bg-white/10 transition focus-ring">
+
+          ↻ Rotate
+
+        </button>
+        <button
+  id="cropBtn"
+  type="button"
+  class="w-full border border-border rounded-xl py-3 mb-3 hover:bg-white/10 transition focus-ring">
+
+  ✂ Crop
+
+</button>
+
+<button
+  id="applyCropBtn"
+  type="button"
+  class="hidden w-full grad-btn rounded-xl py-3 mb-3 font-medium">
+
+  ✓ Apply Crop
+
+</button>
+
+<button
+  id="cancelCropBtn"
+  type="button"
+  class="hidden w-full border border-border rounded-xl py-3 mb-3 hover:bg-white/10 transition focus-ring">
+
+  Cancel Crop
+
+</button>
+
+        <button
+          id="resetBtn"
+          type="button"
+          class="w-full border border-border rounded-xl py-3 hover:bg-white/10 transition focus-ring">
+
+          Reset
+
+        </button>
+<button
+  id="changeImageBtn"
+  type="button"
+  class="w-full border border-border rounded-xl py-3 mt-3 hover:bg-white/10 transition focus-ring">
+
+  🖼 Change Image
+
+</button>
+      </aside>
+
+
+      <!-- CANVAS AREA -->
+      <main
+        class="flex-1 min-w-0 flex flex-col bg-ink">
+
+
+        <!-- UPLOAD SCREEN -->
+        <div
+          id="uploadArea"
+          class="flex-1 flex items-center justify-center p-8">
+
+          <div
+            id="dropZone"
+            class="w-full max-w-xl border-2 border-dashed border-border rounded-2xl p-12 text-center hover:border-violet transition cursor-pointer">
+
+            <div class="text-5xl mb-5">
+              🖼️
+            </div>
+
+            <h3
+              class="font-display text-2xl font-semibold mb-2">
+
+              Upload an image
+
+            </h3>
+
+            <p class="text-mute mb-6">
+
+              Drag & drop your image here
+
+              <br>
+
+              or choose a file from your device
+
+            </p>
+
+
+            <button
+              id="uploadButton"
+              type="button"
+              class="grad-btn px-7 py-3 rounded-full font-medium">
+
+              Choose Image
+
+            </button>
+
+
+            <p class="text-xs text-mute mt-5">
+
+              JPG, PNG or WEBP
+
+            </p>
+
+
+            <input
+              id="imageInput"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              class="hidden">
+
+          </div>
+
+        </div>
+
+
+        <!-- IMAGE CANVAS -->
+        <div
+          id="canvasArea"
+          class="hidden flex-1 items-center justify-center p-5 overflow-auto">
+
+          <canvas
+            id="editorCanvas"
+            class="max-w-full max-h-full rounded-xl shadow-2xl">
+          </canvas>
+
+        </div>
+
+
+        <!-- BOTTOM BAR -->
+        <div
+          class="h-16 border-t border-border bg-surface2 px-5 flex items-center justify-between shrink-0">
+
+          <span class="text-xs text-mute">
+
+            Image editing happens in your browser.
+
+          </span>
+
+
+          <button
+            id="downloadBtn"
+            type="button"
+            disabled
+            class="grad-btn px-6 py-2.5 rounded-full font-medium disabled:opacity-40 disabled:cursor-not-allowed">
+
+            ↓ Download
+
+          </button>
+
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+</div>
+<footer class="border-t border-border py-16">
+
+  <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-5 gap-10">
+
+    <div class="md:col-span-2">
+
+      <a href="#" class="flex items-center gap-2 mb-4">
+
+        <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+
+          <rect
+            width="28"
+            height="28"
+            rx="8"
+            fill="url(#footgrad)"
+          />
+
+          <path
+            d="M8 18L13 9L18 18"
+            stroke="white"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+
+          <defs>
+
+            <linearGradient
+              id="footgrad"
+              x1="0"
+              y1="0"
+              x2="28"
+              y2="28">
+
+              <stop stop-color="#7C3AED"/>
+              <stop offset="1" stop-color="#EC4899"/>
+
+            </linearGradient>
+
+          </defs>
+
+        </svg>
+
+        <span class="font-display font-semibold text-lg">
+          PIXART
+        </span>
+
+      </a>
+
+      <p class="text-mute text-sm max-w-xs mb-6">
+        The browser-based photo editor for creators who don't have time to waste.
+      </p>
+
+      <div class="flex gap-4 text-mute">
+
+        <a href="#" class="hover:text-white focus-ring rounded" aria-label="Twitter">
+          𝕏
+        </a>
+
+        <a href="#" class="hover:text-white focus-ring rounded" aria-label="Instagram">
+          ◎
+        </a>
+
+        <a href="#" class="hover:text-white focus-ring rounded" aria-label="YouTube">
+          ▶
+        </a>
+
+      </div>
+
+    </div>
+
+
+    <div>
+
+      <h4 class="font-medium text-sm mb-4">
+        Product
+      </h4>
+
+      <ul class="space-y-3 text-sm text-mute">
+
+        <li>
+          <a href="#features" class="hover:text-white">
+            Features
+          </a>
+        </li>
+
+        <li>
+          <a href="#templates" class="hover:text-white">
+            Templates
+          </a>
+        </li>
+
+        <li>
+          <a href="#pricing" class="hover:text-white">
+            Pricing
+          </a>
+        </li>
+
+      </ul>
+
+    </div>
+
+
+    <div>
+
+      <h4 class="font-medium text-sm mb-4">
+        Company
+      </h4>
+
+      <ul class="space-y-3 text-sm text-mute">
+
+        <li>
+          <a href="#" class="hover:text-white">
+            About
+          </a>
+        </li>
+
+        <li>
+          <a href="#" class="hover:text-white">
+            Careers
+          </a>
+        </li>
+
+        <li>
+          <a href="#" class="hover:text-white">
+            Blog
+          </a>
+        </li>
+
+      </ul>
+
+    </div>
+
+
+    <div>
+
+      <h4 class="font-medium text-sm mb-4">
+        Legal
+      </h4>
+
+      <ul class="space-y-3 text-sm text-mute">
+
+        <li>
+          <a href="#" class="hover:text-white">
+            Privacy
+          </a>
+        </li>
+
+        <li>
+          <a href="#" class="hover:text-white">
+            Terms
+          </a>
+        </li>
+
+      </ul>
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="max-w-7xl mx-auto px-6 mt-12 pt-8 border-t border-border text-xs text-mute">
+
+    © 2026 PIXART. All rights reserved.
+
+  </div>
+
+</footer>
+
+
+<!-- JAVASCRIPT -->
+<script>
+
+const nav = document.getElementById('mainNav');
+
+window.addEventListener('scroll', () => {
+
+  if (window.scrollY > 20) {
+    nav.classList.add('scrolled');
+  } else {
+    nav.classList.remove('scrolled');
+  }
+
+});
+
+
+const menuBtn = document.getElementById('menuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+
+menuBtn.addEventListener('click', () => {
+
+  const isOpen =
+    !mobileMenu.classList.contains('hidden');
+
+  mobileMenu.classList.toggle('hidden');
+
+  menuBtn.setAttribute(
+    'aria-expanded',
+    String(!isOpen)
+  );
+
+});
+
+
+const range = document.getElementById('compareRange');
+const afterWrap = document.getElementById('afterWrap');
+const handleLine = document.getElementById('handleLine');
+
+range.addEventListener('input', (e) => {
+
+  const val = e.target.value;
+
+  afterWrap.style.clipPath =
+    `inset(0 ${100 - val}% 0 0)`;
+
+  handleLine.style.left =
+    val + '%';
+
+});
+// ==========================================
+// PIXART EDITOR - OPEN / CLOSE
+// ==========================================
+
+const editorModal = document.getElementById("editorModal");
+const tryFreeBtn = document.getElementById("tryFreeBtn");
+const closeEditor = document.getElementById("closeEditor");
+
+// Open editor
+tryFreeBtn.addEventListener("click", function (event) {
+  event.preventDefault();
+
+  editorModal.classList.remove("hidden");
+
+  // Prevent the landing page from scrolling
+  document.body.style.overflow = "hidden";
+});
+const startEditingBtn =
+    document.getElementById("startEditingBtn");
+
+startEditingBtn.addEventListener("click", function (event) {
+
+    event.preventDefault();
+
+    editorModal.classList.remove("hidden");
+
+    document.body.style.overflow = "hidden";
+
+});
+
+// Close editor
+closeEditor.addEventListener("click", function () {
+  editorModal.classList.add("hidden");
+
+  // Restore page scrolling
+  document.body.style.overflow = "";
+});
+
+
+// Close editor with Escape key
+document.addEventListener("keydown", function (event) {
+
+  if (
+    event.key === "Escape" &&
+    !editorModal.classList.contains("hidden")
+  ) {
+
+    editorModal.classList.add("hidden");
+
+    document.body.style.overflow = "";
+
+  }
+
+});
+// ==========================================
+// PIXART EDITOR - IMAGE UPLOAD
+// ==========================================
+
+const uploadButton = document.getElementById("uploadButton");
+const imageInput = document.getElementById("imageInput");
+const dropZone = document.getElementById("dropZone");
+
+const uploadArea = document.getElementById("uploadArea");
+const canvasArea = document.getElementById("canvasArea");
+
+const canvas = document.getElementById("editorCanvas");
+const ctx = canvas.getContext("2d");
+
+const downloadBtn = document.getElementById("downloadBtn");
+
+let originalImage = null;
+let originalImageBackup = null;
+
+// ==========================================
+// CHOOSE IMAGE BUTTON
+// ==========================================
+
+uploadButton.addEventListener("click", function (event) {
+
+  event.stopPropagation();
+
+  imageInput.click();
+
+});
+
+
+// ==========================================
+// CLICK DROP ZONE
+// ==========================================
+
+dropZone.addEventListener("click", function () {
+
+  imageInput.click();
+
+});
+
+
+// ==========================================
+// FILE SELECTED
+// ==========================================
+
+imageInput.addEventListener("change", function (event) {
+
+  const file = event.target.files[0];
+
+  if (!file) {
+    return;
+  }
+
+  loadImage(file);
+
+});
+
+
+// ==========================================
+// LOAD IMAGE
+// ==========================================
+
+function loadImage(file) {
+
+  // Make sure it is actually an image
+  if (!file.type.startsWith("image/")) {
+
+    alert("Please select an image file.");
+
+    return;
+
+  }
+
+
+  const reader = new FileReader();
+
+
+  reader.onload = function (event) {
+
+    const image = new Image();
+
+
+    image.onload = function () {
+
+      originalImage = image;
+      originalImageBackup = image;
+
+
+      // Set canvas to image's original dimensions
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+
+
+      // Clear canvas
+      ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+
+      // Draw image
+      ctx.drawImage(
+        image,
+        0,
+        0
+      );
+
+
+      // Hide upload screen
+      uploadArea.classList.add("hidden");
+
+
+      // Show canvas
+      canvasArea.classList.remove("hidden");
+      canvasArea.classList.add("flex");
+
+
+      // Enable download
+      downloadBtn.disabled = false;
+
+    };
+
+
+    image.src = event.target.result;
+
+  };
+
+
+  reader.readAsDataURL(file);
+
+}
+// ==========================================
+// PIXART EDITOR - IMAGE ADJUSTMENTS
+// ==========================================
+
+const brightness = document.getElementById("brightness");
+const contrast = document.getElementById("contrast");
+const saturation = document.getElementById("saturation");
+
+const brightnessValue =
+    document.getElementById("brightnessValue");
+
+const contrastValue =
+    document.getElementById("contrastValue");
+
+const saturationValue =
+    document.getElementById("saturationValue");
+
+
+// ==========================================
+// RENDER EDITED IMAGE
+// ==========================================
+
+function renderImage() {
+
+    if (!originalImage) {
+        return;
+    }
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    const brightnessAmount =
+        100 + Number(brightness.value);
+
+    const contrastAmount =
+        100 + Number(contrast.value);
+
+    const saturationAmount =
+        100 + Number(saturation.value);
+
+
+    ctx.filter = `
+    brightness(${brightnessAmount}%)
+    contrast(${contrastAmount}%)
+    saturate(${saturationAmount}%)
+    grayscale(${grayscaleEnabled ? 100 : 0}%)
+`;
+
+
+    ctx.drawImage(
+        originalImage,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+}
+
+
+// ==========================================
+// BRIGHTNESS
+// ==========================================
+
+brightness.addEventListener("input", function () {
+
+    brightnessValue.textContent =
+        brightness.value;
+
+    renderImage();
+
+});
+
+
+// ==========================================
+// CONTRAST
+// ==========================================
+
+contrast.addEventListener("input", function () {
+
+    contrastValue.textContent =
+        contrast.value;
+
+    renderImage();
+
+});
+
+
+// ==========================================
+// SATURATION
+// ==========================================
+
+saturation.addEventListener("input", function () {
+
+    saturationValue.textContent =
+        saturation.value;
+
+    renderImage();
+
+});
+// ==========================================
+// GRAYSCALE
+// ==========================================
+
+const grayscaleBtn =
+    document.getElementById("grayscaleBtn");
+
+let grayscaleEnabled = false;
+
+grayscaleBtn.addEventListener("click", function () {
+
+    grayscaleEnabled = !grayscaleEnabled;
+
+    if (grayscaleEnabled) {
+        grayscaleBtn.textContent = "✓ Grayscale";
+    } else {
+        grayscaleBtn.textContent = "Grayscale";
+    }
+
+    renderImage();
+
+});
+// ==========================================
+// ROTATE
+// ==========================================
+
+const rotateBtn =
+    document.getElementById("rotateBtn");
+
+let rotation = 0;
+
+rotateBtn.addEventListener("click", function () {
+
+    rotation += 90;
+
+    if (rotation >= 360) {
+        rotation = 0;
+    }
+
+    renderRotatedImage();
+
+});
+
+
+function renderRotatedImage() {
+
+    if (!originalImage) {
+        return;
+    }
+
+    const oldWidth = originalImage.naturalWidth;
+    const oldHeight = originalImage.naturalHeight;
+
+    if (rotation === 90 || rotation === 270) {
+
+        canvas.width = oldHeight;
+        canvas.height = oldWidth;
+
+    } else {
+
+        canvas.width = oldWidth;
+        canvas.height = oldHeight;
+
+    }
+
+    ctx.save();
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    ctx.translate(
+        canvas.width / 2,
+        canvas.height / 2
+    );
+
+    ctx.rotate(
+        rotation * Math.PI / 180
+    );
+
+    const brightnessAmount =
+        100 + Number(brightness.value);
+
+    const contrastAmount =
+        100 + Number(contrast.value);
+
+    const saturationAmount =
+        100 + Number(saturation.value);
+
+    ctx.filter = `
+        brightness(${brightnessAmount}%)
+        contrast(${contrastAmount}%)
+        saturate(${saturationAmount}%)
+        grayscale(${grayscaleEnabled ? 100 : 0}%)
+    `;
+
+    ctx.drawImage(
+        originalImage,
+        -oldWidth / 2,
+        -oldHeight / 2
+    );
+
+    ctx.restore();
+
+}
+// ==========================================
+// RESET
+// ==========================================
+
+const resetBtn =
+    document.getElementById("resetBtn");
+
+    resetBtn.addEventListener("click", function () {
+
+    // Reset adjustments
+    brightness.value = 0;
+    contrast.value = 0;
+    saturation.value = 0;
+
+    brightnessValue.textContent = "0";
+    contrastValue.textContent = "0";
+    saturationValue.textContent = "0";
+
+    grayscaleEnabled = false;
+    grayscaleBtn.textContent = "Grayscale";
+
+    rotation = 0;
+
+    // Restore original image
+    if (originalImageBackup) {
+
+        originalImage = originalImageBackup;
+
+        canvas.width =
+            originalImage.naturalWidth;
+
+        canvas.height =
+            originalImage.naturalHeight;
+
+    }
+
+    renderImage();
+
+});
+
+// ==========================================
+// DOWNLOAD EDITED IMAGE
+// ==========================================
+
+downloadBtn.addEventListener("click", function () {
+
+    if (!originalImage) {
+        return;
+    }
+
+    const link =
+        document.createElement("a");
+
+    link.download = "pixart-edited-image.png";
+
+    link.href =
+        canvas.toDataURL("image/png");
+
+    link.click();
+
+});
+// ==========================================
+// CHANGE IMAGE
+// ==========================================
+
+const changeImageBtn =
+    document.getElementById("changeImageBtn");
+
+changeImageBtn.addEventListener("click", function () {
+
+    imageInput.click();
+
+});
+// ==========================================
+// PROJECT NAME
+// ==========================================
+
+const projectName =
+    document.getElementById("projectName");
+
+projectName.addEventListener("keydown", function (event) {
+
+    if (event.key === "Enter") {
+
+        event.preventDefault();
+
+        projectName.blur();
+
+    }
+
+});
+// ==========================================
+// PIXART EDITOR - CROP TOOL
+// ==========================================
+
+const cropBtn =
+    document.getElementById("cropBtn");
+
+const applyCropBtn =
+    document.getElementById("applyCropBtn");
+
+const cancelCropBtn =
+    document.getElementById("cancelCropBtn");
+
+
+let cropMode = false;
+
+let cropStartX = 0;
+let cropStartY = 0;
+
+let cropEndX = 0;
+let cropEndY = 0;
+
+
+// ==========================================
+// START CROP
+// ==========================================
+
+cropBtn.addEventListener("click", function () {
+
+    if (!originalImage) {
+        alert("Please upload an image first.");
+        return;
+    }
+
+    cropMode = true;
+
+    applyCropBtn.classList.remove("hidden");
+    cancelCropBtn.classList.remove("hidden");
+
+    cropBtn.classList.add("hidden");
+
+    canvas.style.cursor = "crosshair";
+
+});
+
+
+// ==========================================
+// MOUSE DOWN
+// ==========================================
+
+canvas.addEventListener("mousedown", function (event) {
+
+    if (!cropMode) {
+        return;
+    }
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+    const scaleX =
+        canvas.width / rect.width;
+
+    const scaleY =
+        canvas.height / rect.height;
+
+
+    cropStartX =
+        (event.clientX - rect.left) * scaleX;
+
+    cropStartY =
+        (event.clientY - rect.top) * scaleY;
+
+
+    cropEndX = cropStartX;
+    cropEndY = cropStartY;
+
+
+    drawCropSelection();
+
+});
+
+
+// ==========================================
+// MOUSE MOVE
+// ==========================================
+
+canvas.addEventListener("mousemove", function (event) {
+
+    if (!cropMode) {
+        return;
+    }
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+    const scaleX =
+        canvas.width / rect.width;
+
+    const scaleY =
+        canvas.height / rect.height;
+
+
+    cropEndX =
+        (event.clientX - rect.left) * scaleX;
+
+    cropEndY =
+        (event.clientY - rect.top) * scaleY;
+
+
+    drawCropSelection();
+
+});
+
+
+// ==========================================
+// MOUSE UP
+// ==========================================
+
+canvas.addEventListener("mouseup", function () {
+
+    if (!cropMode) {
+        return;
+    }
+
+    drawCropSelection();
+
+});
+
+
+// ==========================================
+// DRAW CROP SELECTION
+// ==========================================
+
+function drawCropSelection() {
+
+    if (!originalImage) {
+        return;
+    }
+
+
+    renderImage();
+
+
+    const x =
+        Math.min(cropStartX, cropEndX);
+
+    const y =
+        Math.min(cropStartY, cropEndY);
+
+    const width =
+        Math.abs(cropEndX - cropStartX);
+
+    const height =
+        Math.abs(cropEndY - cropStartY);
+
+
+    ctx.save();
+
+
+    // Dark overlay
+    ctx.fillStyle =
+        "rgba(0, 0, 0, 0.45)";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    // Clear selected area
+    ctx.globalCompositeOperation =
+        "destination-out";
+
+    ctx.fillRect(
+        x,
+        y,
+        width,
+        height
+    );
+
+
+    ctx.globalCompositeOperation =
+        "source-over";
+
+
+    // Selection border
+    ctx.strokeStyle =
+        "#ffffff";
+
+    ctx.lineWidth = 3;
+
+    ctx.setLineDash([8, 6]);
+
+    ctx.strokeRect(
+        x,
+        y,
+        width,
+        height
+    );
+
+
+    ctx.restore();
+
+}
+
+
+// ==========================================
+// APPLY CROP
+// ==========================================
+
+applyCropBtn.addEventListener("click", function () {
+
+    const x =
+        Math.min(cropStartX, cropEndX);
+
+    const y =
+        Math.min(cropStartY, cropEndY);
+
+    const width =
+        Math.abs(cropEndX - cropStartX);
+
+    const height =
+        Math.abs(cropEndY - cropStartY);
+
+
+    if (width < 10 || height < 10) {
+
+        alert("Please select an area to crop.");
+
+        return;
+
+    }
+
+
+    const croppedCanvas =
+        document.createElement("canvas");
+
+    croppedCanvas.width =
+        Math.round(width);
+
+    croppedCanvas.height =
+        Math.round(height);
+
+
+    const croppedCtx =
+        croppedCanvas.getContext("2d");
+
+
+    croppedCtx.drawImage(
+        canvas,
+        x,
+        y,
+        width,
+        height,
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    const croppedImage =
+        new Image();
+
+
+    croppedImage.onload = function () {
+
+        originalImage =
+            croppedImage;
+
+
+        canvas.width =
+            croppedImage.naturalWidth;
+
+        canvas.height =
+            croppedImage.naturalHeight;
+
+
+        rotation = 0;
+
+        grayscaleEnabled = false;
+
+        brightness.value = 0;
+        contrast.value = 0;
+        saturation.value = 0;
+
+
+        brightnessValue.textContent = "0";
+        contrastValue.textContent = "0";
+        saturationValue.textContent = "0";
+
+        grayscaleBtn.textContent =
+            "Grayscale";
+
+
+        exitCropMode();
+
+        renderImage();
+
+    };
+
+
+    croppedImage.src =
+        croppedCanvas.toDataURL("image/png");
+
+});
+
+
+// ==========================================
+// CANCEL CROP
+// ==========================================
+
+cancelCropBtn.addEventListener("click", function () {
+
+    exitCropMode();
+
+});
+
+
+// ==========================================
+// EXIT CROP MODE
+// ==========================================
+
+function exitCropMode() {
+
+    cropMode = false;
+
+    cropStartX = 0;
+    cropStartY = 0;
+    cropEndX = 0;
+    cropEndY = 0;
+
+
+    canvas.style.cursor = "default";
+
+
+    applyCropBtn.classList.add("hidden");
+
+    cancelCropBtn.classList.add("hidden");
+
+    cropBtn.classList.remove("hidden");
+
+
+    renderImage();
+
+}
+</script>
+
+</body>
+</html>
